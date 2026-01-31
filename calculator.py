@@ -8,8 +8,12 @@ class Calculator:
         # ساخت پنجره اصلی
         self.root = tk.Tk()
         self.root.title("ماشین حساب علمی")
-        self.root.geometry("480x530")
+        self.root.geometry("420x440")
         self.root.resizable(False, False)
+        
+        # تنظیم وزن ستون‌ها برای توزیع یکنواخت فضا
+        for i in range(5):
+            self.root.grid_columnconfigure(i, weight=1, uniform="col")
         
         # متغیر برای نگهداری عبارت
         self.expression = ""
@@ -17,12 +21,12 @@ class Calculator:
         # ساخت صفحه نمایش
         self.display = tk.Entry(
             self.root,
-            font=("Arial", 24),
+            font=("Arial", 20),
             justify="right",
             bd=10,
             relief="sunken"
         )
-        self.display.grid(row=0, column=0, columnspan=5, padx=10, pady=10, sticky="nsew")
+        self.display.grid(row=0, column=0, columnspan=5, padx=5, pady=5, sticky="ew")
         
         # ساخت دکمه‌ها
         self.create_buttons()
@@ -36,13 +40,13 @@ class Calculator:
             button = tk.Button(
                 self.root,
                 text=btn,
-                font=("Arial", 14),
-                width=6,
+                font=("Arial", 12),
+                width=5,
                 height=2,
                 bg="#e1bee7",
                 command=lambda x=btn: self.apply_scientific(x)
             )
-            button.grid(row=1, column=i, padx=2, pady=2)
+            button.grid(row=1, column=i, padx=1, pady=1, sticky="nsew")
         
         # دکمه‌های خاص - ردیف دوم
         special_buttons = ['(', ')', '^', 'π', 'C']
@@ -57,25 +61,28 @@ class Calculator:
             button = tk.Button(
                 self.root,
                 text=btn,
-                font=("Arial", 14),
-                width=6,
+                font=("Arial", 12),
+                width=5,
                 height=2,
                 bg="#fff9c4",
                 command=command
             )
-            button.grid(row=2, column=i, padx=2, pady=2)
+            button.grid(row=2, column=i, padx=1, pady=1, sticky="nsew")
 
         
         # دکمه‌های اعداد و عملگرها
         buttons = [
-            ['7', '8', '9', '/'],
-            ['4', '5', '6', '*'],
-            ['1', '2', '3', '-'],
-            ['0', '.', '=', '+']
+            ['7', '8', '9', '/', ''],
+            ['4', '5', '6', '*', ''],
+            ['1', '2', '3', '-', ''],
+            ['0', '.', '=', '+', '']
         ]
         
         for row_index, row in enumerate(buttons):
             for col_index, btn in enumerate(row):
+                if btn == '':
+                    continue  # رد شدن از ستون خالی
+                    
                 if btn == '=':
                     command = self.calculate
                     bg_color = "#a5d6a7"  # سبز برای مساوی
@@ -89,13 +96,13 @@ class Calculator:
                 button = tk.Button(
                     self.root,
                     text=btn,
-                    font=("Arial", 18),
-                    width=6,
+                    font=("Arial", 16),
+                    width=5,
                     height=2,
                     bg=bg_color,
                     command=command
                 )
-                button.grid(row=row_index + 3, column=col_index, padx=2, pady=2)
+                button.grid(row=row_index + 3, column=col_index, padx=1, pady=1, sticky="nsew")
     
     def click(self, value):
         """اضافه کردن مقدار به عبارت"""

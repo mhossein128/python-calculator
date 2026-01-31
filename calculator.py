@@ -1,5 +1,7 @@
 import tkinter as tk
-import math
+import numpy as np
+from sympy import sympify, N, SympifyError
+import re
 
 class Calculator:
     """کلاس اصلی ماشین حساب علمی"""
@@ -113,61 +115,76 @@ class Calculator:
         self.update_display()
     
     def calculate(self):
-        """محاسبه نتیجه عبارت"""
+        """محاسبه نتیجه عبارت با استفاده از SymPy"""
         try:
             # تبدیل ^ به ** برای توان
             expr = self.expression.replace('^', '**')
             
-            # محاسبه نتیجه
-            result = eval(expr)
+            # استفاده از SymPy برای محاسبات نمادین و دقیق‌تر
+            # sympify عبارت را به فرم ریاضی تبدیل می‌کند
+            result = sympify(expr)
+            
+            # تبدیل به عدد اعشاری با دقت بالا
+            # result = N(result, 12)
             
             # نمایش نتیجه
             self.expression = str(result)
             self.update_display()
             
         except ZeroDivisionError:
-            self.expression = "Error"
+            self.expression = "خطا: تقسیم بر صفر"
+            self.update_display()
+        except SympifyError:
+            self.expression = "خطا: عبارت نامعتبر"
             self.update_display()
         except:
-            self.expression = "Error"
+            self.expression = "خطا"
             self.update_display()
     
     def apply_scientific(self, func_name):
-        """اعمال توابع علمی"""
+        """اعمال توابع علمی با استفاده از NumPy برای دقت بالاتر"""
         try:
             # گرفتن عدد فعلی
             value = float(self.expression)
             
             if func_name == 'sin':
+                # استفاده از NumPy برای محاسبات دقیق‌تر
                 # تبدیل درجه به رادیان و محاسبه سینوس
-                result = math.sin(math.radians(value))
+                result = np.sin(np.radians(value))
             elif func_name == 'cos':
                 # تبدیل درجه به رادیان و محاسبه کسینوس
-                result = math.cos(math.radians(value))
+                result = np.cos(np.radians(value))
             elif func_name == 'tan':
                 # تبدیل درجه به رادیان و محاسبه تانژانت
-                result = math.tan(math.radians(value))
+                result = np.tan(np.radians(value))
             elif func_name == 'sqrt':
-                # بررسی عدد منفی
+                # NumPy می‌تواند جذر اعداد منفی را هم محاسبه کند (عدد مختلط)
                 if value < 0:
-                    self.expression = "Error"
-                    self.update_display()
-                    return
-                result = math.sqrt(value)
+                    result = np.sqrt(value + 0j)  # عدد مختلط
+                else:
+                    result = np.sqrt(value)
             elif func_name == 'log':
                 # بررسی عدد نامعتبر
                 if value <= 0:
-                    self.expression = "Error"
+                    self.expression = "خطا: log فقط برای اعداد مثبت"
                     self.update_display()
                     return
-                result = math.log(value)
+                result = np.log(value)  # لگاریتم طبیعی
             
-            # نمایش نتیجه
-            self.expression = str(result)
+            # نمایش نتیجه با دقت بالا
+            # اگر عدد مختلط است، به صورت a+bj نمایش می‌دهد
+            if isinstance(result, complex):
+                self.expression = f"{result.real:.10f}+{result.imag:.10f}j"
+            else:
+                self.expression = f"{result:.10f}"
+            
             self.update_display()
             
+        except ValueError as e:
+            self.expression = f"خطا: {str(e)}"
+            self.update_display()
         except:
-            self.expression = "Error"
+            self.expression = "خطا"
             self.update_display()
     
     def run(self):
